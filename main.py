@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.0.0 Beta
+#Code version 1.0.1 Beta
 
 import logging
 import requests
@@ -12,7 +12,7 @@ from persiantools.jdatetime import JalaliDateTime
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
 
-TOKEN = 'Token'
+TOKEN = 'YOUR_TELEGRAM_TOKEN'
 COOKIES_FILE = 'cookies.txt'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -57,7 +57,7 @@ class TelegramBot:
         if query.data == 'view_volume':
             context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
         elif query.data == 'support':
-            context.bot.send_message(chat_id=update.effective_chat.id, text="جهت پشتیبانی به @yourID پیام بدید")
+            context.bot.send_message(chat_id=update.effective_chat.id, text="به پشتیبانی خوش آمدید")
 
     def get_volume(self, connection_name):
         if not self.check_cookies():
@@ -68,6 +68,9 @@ class TelegramBot:
 
         if response.status_code == 200:
             data = json.loads(response.text)
+            if data['obj'] is None:
+                return "نام کاربری وارد شده صحیح نمی باشد لطفا مجدد تلاش کنید"
+
             down = data['obj']['down']
             up = data['obj']['up']
             total = data['obj']['total']
@@ -78,7 +81,7 @@ class TelegramBot:
 
             expiry_time = self.get_expiry_time(data)
 
-            volume_message = f"مقدار دانلود: {down_gigabit} GB\nمقدار آپلود: {up_gigabit} GB\nمجموع مصرف: {(down_gigabit + up_gigabit)} GB\nحجم باقی مانده: {total_gigabit - (down_gigabit + up_gigabit)} GB\nتاریخ انقضا: {expiry_time}\n"
+            volume_message = f"مقدار دانلود: {down_gigabit} GB\nمقدار آپلود: {up_gigabit} GB\nمجموع مصرف: {total_gigabit} GB\nحجم باقی مانده: {total_gigabit - (down_gigabit + up_gigabit)} GB\nتاریخ انقضا: {expiry_time}"
             return volume_message
         else:
             return "دریافت اطلاعات امکان‌پذیر نیست"
@@ -93,7 +96,7 @@ class TelegramBot:
     def run_login_script(self):
         url = 'https://address:port/login'
         data = {
-            'username': 'user',
+            'username': 'username',
             'password': 'password'
         }
 
@@ -127,4 +130,4 @@ bot.start_bot()
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.0.0 Beta
+#Code version 1.0.1 Beta
