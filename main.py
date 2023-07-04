@@ -81,7 +81,7 @@ class TelegramBot:
 
             expiry_time = self.get_expiry_time(data)
 
-            volume_message = f"مقدار دانلود: {down_gigabit} GB\nمقدار آپلود: {up_gigabit} GB\nمجموع مصرف: {total_gigabit} GB\nحجم باقی مانده: {total_gigabit - (down_gigabit + up_gigabit)} GB\nتاریخ انقضا: {expiry_time}"
+            volume_message = f"مقدار دانلود: {down_gigabit} GB\nمقدار آپلود: {up_gigabit} GB\nمجموع مصرف: {(down_gigabit + up_gigabit)} GB\nحجم باقی مانده: {total_gigabit - (down_gigabit + up_gigabit)} GB\nتاریخ انقضا: {expiry_time}"
             return volume_message
         else:
             return "دریافت اطلاعات امکان‌پذیر نیست"
