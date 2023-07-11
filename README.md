@@ -10,7 +10,9 @@
 
 # آموزش نصب
 1- جهت نصب سریع دستور زیر را بزنید تا پیشنیاز های اسکریپت نصب شود.<br>
-( bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/install.sh) )
+```
+ bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/install.sh)
+```
 2- از خط 15 تا 18 را ویرایش نمایید <br> 
 # حمایت از پروژه
 لطفا فقط با ستاره دادن از پروژه حمایت بکنید
