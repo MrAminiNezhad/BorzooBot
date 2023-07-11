@@ -31,6 +31,7 @@ class TelegramBot:
         self.dispatcher.add_handler(CallbackQueryHandler(self.handle_callback_query))
 
         self.session = requests.Session()
+        self.waiting_for_connection = False
 
     def start(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="به ربات نمایش حجم خوش آمدید")
@@ -49,30 +50,26 @@ class TelegramBot:
     def handle_message(self, update, context):
         text = update.message.text
 
-        if text == 'مشاهده حجم':
-            context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
-        else:
-            volume_message = self.get_volume(update, context, text)
+        if self.waiting_for_connection:
+            self.waiting_for_connection = False
+            volume_message = self.get_volume(text)
             context.bot.send_message(chat_id=update.effective_chat.id, text=volume_message)
+        else:
+            if text == 'مشاهده حجم':
+                context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
 
     def handle_callback_query(self, update, context):
         query = update.callback_query
         query.answer()  # پاسخ به کوئری دکمه شیشه‌ای
 
         if query.data == 'view_volume':
+            self.waiting_for_connection = True
             context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
+
         elif query.data == 'support':
             context.bot.send_message(chat_id=update.effective_chat.id, text="به پشتیبانی خوش آمدید")
-        elif query.data == 'back':
-            keyboard = [
-                [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
-                [InlineKeyboardButton("پشتیبانی", callback_data='support')]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
 
-            context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً یک گزینه را انتخاب کنید:", reply_markup=reply_markup)
-
-    def get_volume(self, update, context, connection_name):
+    def get_volume(self, connection_name):
         if not self.check_cookies():
             self.run_login_script()
 
@@ -96,13 +93,7 @@ class TelegramBot:
             expiry_time = self.get_expiry_time(data)
 
             volume_message = f"مقدار دانلود: {down_gigabit} GB\nمقدار آپلود: {up_gigabit} GB\nمجموع مصرف: {(down_gigabit + up_gigabit)} GB\nحجم باقی مانده: {total_gigabit - (down_gigabit + up_gigabit)} GB\nتاریخ انقضا: {expiry_time}"
-
-            keyboard = [
-                [InlineKeyboardButton("بازگشت", callback_data='back')]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-
-            context.bot.send_message(chat_id=update.effective_chat.id, text=volume_message, reply_markup=reply_markup)
+            return volume_message
         else:
             return "دریافت اطلاعات امکان‌پذیر نیست"
 
