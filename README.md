@@ -13,7 +13,14 @@
 ```
  bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/install.sh)
 ```
-2- از خط 15 تا 18 را ویرایش نمایید <br> 
+2- سپس با دستور زیر خطوط 15 تا 18 را ویرایش نمایید <br>
+```
+nano main.py
+```
+جهت اجرای اسکریپت دستور زیر را بزنید <br>
+```
+nohup python3 main.py &
+```
 # حمایت از پروژه
 لطفا فقط با ستاره دادن از پروژه حمایت بکنید
 
