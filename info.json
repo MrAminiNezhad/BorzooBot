@@ -1,0 +1,7 @@
+{
+  "TOKEN": "your_token",
+  "Panel_URL": "https://Panel_Adress:Port",
+  "Panel_USER": "your_username",
+  "Panel_PASS": "your_password",
+  "Support_text": "متن پشتیبانی شما"
+}
