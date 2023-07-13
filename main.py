@@ -1,7 +1,8 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.1.2
+#Code version 1.2.0
+
 
 import logging
 import requests
@@ -12,19 +13,11 @@ from persiantools.jdatetime import JalaliDateTime
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
 
-TOKEN = 'Your_Token'
-Panel_URL = 'Panel_Adress:Port' #Example https://mypanel.com:2080
-Panel_USER = 'UserName'
-Panel_PASS = 'PassWord'
-Support_text = 'متن پشتیبانی شما'
-
-COOKIES_FILE = 'cookies.txt' # Don't Change
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
+COOKIES_FILE = 'cookies.txt'
 
 class TelegramBot:
-    def __init__(self, token):
+    def __init__(self, token, panel_url, panel_user, panel_pass, support_text):
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
 
@@ -34,6 +27,11 @@ class TelegramBot:
 
         self.session = requests.Session()
         self.waiting_for_connection = False
+
+        self.panel_url = panel_url
+        self.panel_user = panel_user
+        self.panel_pass = panel_pass
+        self.support_text = support_text
 
     def start(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="به ربات نمایش حجم خوش آمدید")
@@ -69,13 +67,13 @@ class TelegramBot:
             context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
 
         elif query.data == 'support':
-            context.bot.send_message(chat_id=update.effective_chat.id, text= f"{Support_text}")
+            context.bot.send_message(chat_id=update.effective_chat.id, text=self.support_text)
 
     def get_volume(self, connection_name):
         if not self.check_cookies():
             self.run_login_script()
 
-        url = f"{Panel_URL}/panel/api/inbounds/getClientTraffics/{connection_name}"
+        url = f"{self.panel_url}/panel/api/inbounds/getClientTraffics/{connection_name}"
         response = self.session.get(url)
 
         if response.status_code == 200:
@@ -107,10 +105,10 @@ class TelegramBot:
             return False
 
     def run_login_script(self):
-        url = f"{Panel_URL}/login"
+        url = f"{self.panel_url}/login"
         data = {
-            'username': Panel_USER,
-            'password': Panel_PASS
+            'username': self.panel_user,
+            'password': self.panel_pass
         }
 
         response = self.session.post(url, data=data)
@@ -137,10 +135,27 @@ class TelegramBot:
         self.updater.stop()
 
 
-bot = TelegramBot(TOKEN)
+def read_info_from_file():
+    with open('info.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    token = data['TOKEN']
+    panel_url = data['Panel_URL']
+    panel_user = data['Panel_USER']
+    panel_pass = data['Panel_PASS']
+    support_text = data['Support_text']
+
+    return token, panel_url, panel_user, panel_pass, support_text
+
+
+
+TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text = read_info_from_file()
+
+bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text)
 bot.start_bot()
+
 
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.1.2
+#Code version 1.2.0
