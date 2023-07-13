@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.1.1
+#Code version 1.1.2
 
 import logging
 import requests
@@ -16,6 +16,8 @@ TOKEN = 'Your_Token'
 Panel_URL = 'Panel_Adress:Port' #Example https://mypanel.com:2080
 Panel_USER = 'UserName'
 Panel_PASS = 'PassWord'
+Support_text = 'متن پشتیبانی شما'
+
 COOKIES_FILE = 'cookies.txt' # Don't Change
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -67,7 +69,7 @@ class TelegramBot:
             context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
 
         elif query.data == 'support':
-            context.bot.send_message(chat_id=update.effective_chat.id, text="به پشتیبانی خوش آمدید")
+            context.bot.send_message(chat_id=update.effective_chat.id, text= f"{Support_text}")
 
     def get_volume(self, connection_name):
         if not self.check_cookies():
@@ -141,4 +143,4 @@ bot.start_bot()
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.1.1
+#Code version 1.1.2
