@@ -25,6 +25,11 @@ nohup python3 main.py &
 ```
 pkill -f "main.py"
 ```
+# بروز رسانی
+جهت بروز رسانی از دستور زیر استفاده بکنید <br>
+```
+ bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/update.sh)
+```
 # حمایت از پروژه
 لطفا فقط با ستاره دادن از پروژه حمایت بکنید
 
