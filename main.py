@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.0
+#Code version 1.2.1
 
 
 import logging
@@ -14,10 +14,11 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 COOKIES_FILE = 'cookies.txt'
 
 class TelegramBot:
-    def __init__(self, token, panel_url, panel_user, panel_pass, support_text):
+    def __init__(self, token, panel_url, panel_user, panel_pass, support_text, admin_id, welcome_text):
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
 
@@ -27,25 +28,48 @@ class TelegramBot:
 
         self.session = requests.Session()
         self.waiting_for_connection = False
+        self.waiting_for_message = False
 
         self.panel_url = panel_url
         self.panel_user = panel_user
         self.panel_pass = panel_pass
         self.support_text = support_text
+        self.admin_id = admin_id
+        self.welcome_text = welcome_text
+
+        self.create_user_file()
+
+    def create_user_file(self):
+        user_file_path = 'user.txt'
+        if not os.path.isfile(user_file_path):
+            with open(user_file_path, 'w') as file:
+                pass
 
     def start(self, update, context):
-        context.bot.send_message(chat_id=update.effective_chat.id, text="به ربات نمایش حجم خوش آمدید")
+        user_id = update.effective_chat.id
 
-        keyboard = [
-            [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
-            [InlineKeyboardButton("پشتیبانی", callback_data='support')]
-        ]
+        context.bot.send_message(chat_id=user_id, text=self.welcome_text)
+
+        if self.is_admin(user_id):
+            keyboard = [
+                [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
+                [InlineKeyboardButton("پشتیبانی", callback_data='support')],
+                [InlineKeyboardButton("ارسال پیام همگانی", callback_data='send_message')]
+            ]
+        else:
+            keyboard = [
+                [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
+                [InlineKeyboardButton("پشتیبانی", callback_data='support')]
+            ]
+
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text('لطفاً یک گزینه را انتخاب کنید:', reply_markup=reply_markup)
 
         if self.check_cookies():
             os.remove(COOKIES_FILE)
+
+        self.save_user_id(user_id)
 
     def handle_message(self, update, context):
         text = update.message.text
@@ -54,6 +78,22 @@ class TelegramBot:
             self.waiting_for_connection = False
             volume_message = self.get_volume(text)
             context.bot.send_message(chat_id=update.effective_chat.id, text=volume_message)
+        elif self.waiting_for_message:
+            if self.is_admin(update.effective_chat.id):
+                self.waiting_for_message = False
+                user_ids = self.get_all_user_ids()
+                success_count = 0
+                failure_count = 0
+                for user_id in user_ids:
+                    try:
+                        context.bot.send_message(chat_id=user_id, text=text)
+                        success_count += 1
+                    except Exception:
+                        failure_count += 1
+                admin_message = f"ارسال پیام با موفقیت به پایان رسید\nتعداد کل کاربران ربات: {len(user_ids)}\nتعداد ارسال موفق: {success_count}\nتعداد ارسال ناموفق: {failure_count}"
+                context.bot.send_message(chat_id=self.admin_id, text=admin_message)
+            else:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
         else:
             if text == 'مشاهده حجم':
                 context.bot.send_message(chat_id=update.effective_chat.id, text="لطفاً نام کانکشن خود را ارسال فرمایید")
@@ -68,6 +108,13 @@ class TelegramBot:
 
         elif query.data == 'support':
             context.bot.send_message(chat_id=update.effective_chat.id, text=self.support_text)
+
+        elif query.data == 'send_message':
+            if self.is_admin(update.effective_chat.id):
+                context.bot.send_message(chat_id=update.effective_chat.id, text="لطفا پیام مورد نظر خود را ارسال بکنید تا برای تمامی کاربران ارسال شود")
+                self.waiting_for_message = True
+            else:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
 
     def get_volume(self, connection_name):
         if not self.check_cookies():
@@ -134,6 +181,26 @@ class TelegramBot:
     def stop_bot(self):
         self.updater.stop()
 
+    def save_user_id(self, user_id):
+        if not self.is_duplicate_user(user_id):
+            with open('user.txt', 'a') as file:
+                file.write(str(user_id) + '\n')
+        else:
+            print("آی‌دی کاربر تکراری است و اضافه نشد.")
+
+    def is_duplicate_user(self, user_id):
+        user_ids = self.get_all_user_ids()
+        return str(user_id) in user_ids
+
+    def get_all_user_ids(self):
+        with open('user.txt', 'r') as file:
+            user_ids = [line.strip() for line in file]
+
+        return user_ids
+
+    def is_admin(self, user_id):
+        return str(user_id) == str(self.admin_id)
+
 
 def read_info_from_file():
     with open('info.json', 'r', encoding='utf-8') as file:
@@ -144,18 +211,19 @@ def read_info_from_file():
     panel_user = data['Panel_USER']
     panel_pass = data['Panel_PASS']
     support_text = data['Support_text']
+    admin_id = data['admin_id']
+    welcome_text = data['welcome_text']
 
-    return token, panel_url, panel_user, panel_pass, support_text
+    return token, panel_url, panel_user, panel_pass, support_text, admin_id, welcome_text
 
 
+TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text = read_info_from_file()
 
-TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text = read_info_from_file()
-
-bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text)
+bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text)
 bot.start_bot()
 
 
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.0
+#Code version 1.2.1
