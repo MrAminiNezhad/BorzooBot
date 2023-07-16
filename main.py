@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.2
+#Code version 1.2.3
 
 import logging
 import requests
@@ -237,8 +237,7 @@ TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text =
 bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text)
 bot.start_bot()
 
-
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.2
+#Code version 1.2.3
