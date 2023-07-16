@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.3
+#Code version 1.2.4
 
 import logging
 import requests
@@ -53,12 +53,13 @@ class TelegramBot:
             keyboard = [
                 [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
                 [InlineKeyboardButton("پشتیبانی", callback_data='support')],
-                [InlineKeyboardButton("ارسال پیام همگانی", callback_data='send_message')]
+                [InlineKeyboardButton("ارسال پیام همگانی", callback_data='send_message')],
+                [InlineKeyboardButton("آمار کاربران ربات", callback_data='user_count')],
             ]
         else:
             keyboard = [
                 [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
-                [InlineKeyboardButton("پشتیبانی", callback_data='support')]
+                [InlineKeyboardButton("پشتیبانی", callback_data='support')],
             ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -115,6 +116,13 @@ class TelegramBot:
             if self.is_admin(update.effective_chat.id):
                 self.waiting_for_message = True
                 context.bot.send_message(chat_id=update.effective_chat.id, text="لطفا پیام مورد نظر خود را ارسال بکنید تا برای تمامی کاربران ارسال شود")
+            else:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
+
+        elif query.data == 'user_count':
+            if self.is_admin(update.effective_chat.id):
+                user_count = len(self.get_all_user_ids())
+                context.bot.send_message(chat_id=update.effective_chat.id, text=f"تعداد کل کاربران ربات: {user_count}")
             else:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
 
@@ -237,7 +245,8 @@ TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text =
 bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text)
 bot.start_bot()
 
+
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.3
+#Code version 1.2.4
