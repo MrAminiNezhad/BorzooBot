@@ -1,7 +1,7 @@
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.4
+#Code version 1.3.0
 
 import logging
 import requests
@@ -14,10 +14,8 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageH
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-COOKIES_FILE = 'cookies.txt'
-
 class TelegramBot:
-    def __init__(self, token, panel_url, panel_user, panel_pass, support_text, admin_id, welcome_text):
+    def __init__(self, token, panels, support_text, admin_id, welcome_text):
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
 
@@ -29,20 +27,23 @@ class TelegramBot:
         self.waiting_for_connection = False
         self.waiting_for_message = False
 
-        self.panel_url = panel_url
-        self.panel_user = panel_user
-        self.panel_pass = panel_pass
+        self.panels = panels
         self.support_text = support_text
         self.admin_id = admin_id
         self.welcome_text = welcome_text
 
         self.create_user_file()
+        self.create_cookies_folder()
 
     def create_user_file(self):
         user_file_path = 'user.txt'
         if not os.path.isfile(user_file_path):
             with open(user_file_path, 'w') as file:
                 pass
+
+    def create_cookies_folder(self):
+        if not os.path.exists('cookies'):
+            os.makedirs('cookies')
 
     def start(self, update, context):
         user_id = update.effective_chat.id
@@ -54,20 +55,21 @@ class TelegramBot:
                 [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
                 [InlineKeyboardButton("پشتیبانی", callback_data='support')],
                 [InlineKeyboardButton("ارسال پیام همگانی", callback_data='send_message')],
-                [InlineKeyboardButton("آمار کاربران ربات", callback_data='user_count')],
+                [InlineKeyboardButton("آمار کاربران ربات", callback_data='user_stats')]
             ]
         else:
             keyboard = [
                 [InlineKeyboardButton("مشاهده حجم", callback_data='view_volume')],
-                [InlineKeyboardButton("پشتیبانی", callback_data='support')],
+                [InlineKeyboardButton("پشتیبانی", callback_data='support')]
             ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         update.message.reply_text('لطفاً یک گزینه را انتخاب کنید:', reply_markup=reply_markup)
 
-        if self.check_cookies():
-            os.remove(COOKIES_FILE)
+        for panel in self.panels:
+            if self.check_cookies(panel):
+                os.remove(os.path.join('cookies', panel['cookies_file']))
 
         self.save_user_id(user_id)
 
@@ -119,74 +121,75 @@ class TelegramBot:
             else:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
 
-        elif query.data == 'user_count':
-            if self.is_admin(update.effective_chat.id):
-                user_count = len(self.get_all_user_ids())
-                context.bot.send_message(chat_id=update.effective_chat.id, text=f"تعداد کل کاربران ربات: {user_count}")
-            else:
-                context.bot.send_message(chat_id=update.effective_chat.id, text="شما اجازه دسترسی به این عملیات را ندارید.")
+        elif query.data == 'user_stats':
+            user_count = self.get_user_count()
+            user_stats_message = f"تعداد کل کاربران ربات: {user_count}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=user_stats_message)
 
     def get_volume(self, connection_name):
-        if not self.check_cookies():
-            self.run_login_script()
+        for panel in self.panels:
+            if not self.check_cookies(panel):
+                self.run_login_script(panel)
 
-        url = f"{self.panel_url}/panel/api/inbounds/getClientTraffics/{connection_name}"
-        response = self.session.get(url)
+            url = f"{panel['panel_url']}/panel/api/inbounds/getClientTraffics/{connection_name}"
+            response = self.session.get(url)
 
-        if response.status_code == 200:
-            data = json.loads(response.text)
+            if response.status_code == 200:
+                data = json.loads(response.text)
 
-            if data['obj'] is None:
-                return "نام کاربری وارد شده صحیح نمی باشد لطفا مجدد تلاش کنید"
+                if data['obj'] is None:
+                    continue
 
-            down = data['obj']['down']
-            up = data['obj']['up']
-            total = data['obj']['total']
+                down = data['obj']['down']
+                up = data['obj']['up']
+                total = data['obj']['total']
 
-            down_gigabit = self.convert_to_gigabit(down)
-            up_gigabit = self.convert_to_gigabit(up)
-            total_gigabit = self.convert_to_gigabit(total)
+                down_gigabit = self.convert_to_gigabit(down)
+                up_gigabit = self.convert_to_gigabit(up)
+                total_gigabit = self.convert_to_gigabit(total)
 
-            expiry_time = self.get_expiry_time(data)
+                expiry_time = self.get_expiry_time(data)
 
-            acc_status = data['obj']['enable']
-            acc_status_message = "فعال ✅" if acc_status else "غير فعال❌ "
+                acc_status = data['obj']['enable']
+                acc_status_message = "فعال ✅" if acc_status else "غير فعال❌ "
 
-            keyboard = [
-                [InlineKeyboardButton(f"وضعیت اکانت: {acc_status_message}", callback_data='acc_status')],
-                [InlineKeyboardButton(f"مقدار دانلود: {down_gigabit:.2f} GB ⬇", callback_data='download')],
-                [InlineKeyboardButton(f"مقدار آپلود: {up_gigabit:.2f} GB ⬆", callback_data='upload')],
-                [InlineKeyboardButton(f"مجموع مصرف: {(down_gigabit + up_gigabit):.2f} GB ⏳", callback_data='total')],
-                [InlineKeyboardButton(f"حجم کل: {total_gigabit:.2f} GB 🔋", callback_data='total')],
-                [InlineKeyboardButton(f"حجم باقی مانده: {float(total_gigabit) - (float(down_gigabit) + float(up_gigabit)):.2f} GB 📡", callback_data='traffic_remaining')],
-                [InlineKeyboardButton(f"تاریخ انقضا: {expiry_time} 🔚", callback_data='expir')]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
+                keyboard = [
+                    [InlineKeyboardButton(f"وضعیت اکانت: {acc_status_message}", callback_data='acc_status')],
+                    [InlineKeyboardButton(f"مقدار دانلود: {down_gigabit:.2f} GB ⬇", callback_data='download')],
+                    [InlineKeyboardButton(f"مقدار آپلود: {up_gigabit:.2f} GB ⬆", callback_data='upload')],
+                    [InlineKeyboardButton(f"مجموع مصرف: {(down_gigabit + up_gigabit):.2f} GB ⏳", callback_data='total')],
+                    [InlineKeyboardButton(f"حجم کل: {total_gigabit:.2f} GB 🔋", callback_data='total')],
+                    [InlineKeyboardButton(f"حجم باقی مانده: {float(total_gigabit) - (float(down_gigabit) + float(up_gigabit)):.2f} GB 📡", callback_data='traffic_remaining')],
+                    [InlineKeyboardButton(f"تاریخ انقضا: {expiry_time} 🔚", callback_data='expir')]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
 
-            volume_message = f"وضعیت اکانت شما به شرح زیر می باشد."
+                volume_message = f"وضعیت اکانت شما به شرح زیر می باشد."
 
-            return volume_message, reply_markup
-        else:
-            return "دریافت اطلاعات امکان‌پذیر نیست", None
+                return volume_message, reply_markup
+            else:
+                continue
 
-    def check_cookies(self):
+        return "دریافت اطلاعات امکان‌پذیر نیست", None
+
+    def check_cookies(self, panel):
         try:
-            with open(COOKIES_FILE, 'r') as file:
+            with open(os.path.join('cookies', panel['cookies_file']), 'r') as file:
                 return True
         except FileNotFoundError:
             return False
 
-    def run_login_script(self):
-        url = f"{self.panel_url}/login"
+    def run_login_script(self, panel):
+        url = f"{panel['panel_url']}/login"
         data = {
-            'username': self.panel_user,
-            'password': self.panel_pass
+            'username': panel['panel_user'],
+            'password': panel['panel_pass']
         }
 
         response = self.session.post(url, data=data)
 
         if response.status_code == 200:
-            with open(COOKIES_FILE, 'w') as file:
+            with open(os.path.join('cookies', panel['cookies_file']), 'w') as file:
                 file.write(response.text)
 
     def convert_to_gigabit(self, value):
@@ -199,6 +202,11 @@ class TelegramBot:
         jalali_expiry = JalaliDateTime.to_jalali(expiry_datetime)
         expiry_time_str = f"{jalali_expiry.year}/{jalali_expiry.month}/{jalali_expiry.day} {expiry_datetime.strftime('%H:%M:%S')}"
         return expiry_time_str
+
+    def get_user_count(self):
+        with open('user.txt', 'r') as file:
+            user_ids = [line.strip() for line in file]
+        return len(user_ids)
 
     def start_bot(self):
         self.updater.start_polling()
@@ -230,23 +238,21 @@ def read_info_from_file():
         data = json.load(file)
 
     token = data['TOKEN']
-    panel_url = data['Panel_URL']
-    panel_user = data['Panel_USER']
-    panel_pass = data['Panel_PASS']
+    panels = data['panels']
     support_text = data['Support_text']
-    admin_id = data['admin_id']
     welcome_text = data['welcome_text']
+    admin_id = data['admin_id']
 
-    return token, panel_url, panel_user, panel_pass, support_text, admin_id, welcome_text
+    return token, panels, support_text, admin_id, welcome_text
 
 
-TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text = read_info_from_file()
+TOKEN, panels, Support_text, Admin_ID, Welcome_text = read_info_from_file()
 
-bot = TelegramBot(TOKEN, Panel_URL, Panel_USER, Panel_PASS, Support_text, Admin_ID, Welcome_text)
+bot = TelegramBot(TOKEN, panels, Support_text, Admin_ID, Welcome_text)
 bot.start_bot()
 
 
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
 #My Github: https://github.com/MrAminiNezhad/
-#Code version 1.2.4
+#Code version 1.3.0
