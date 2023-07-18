@@ -4,8 +4,10 @@ apt-get update
 
 rm main.py
 
+rm info.json
+
 wget https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/main.py
 
-pkill -f "main.py"
+wget https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/info.json
 
-nohup python3 main.py &
+pkill -f "main.py"
