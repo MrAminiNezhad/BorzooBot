@@ -1,8 +1,14 @@
 {
-  "TOKEN": "your_token",
-  "Panel_URL": "https://Panel_Adress:Port",
-  "Panel_USER": "your_username",
-  "Panel_PASS": "your_password",
+  "TOKEN": "Your_token",
+  "panels": [
+    {
+      "panel_url": "https://panel_address:port",
+      "panel_user": "your_user",
+      "panel_pass": "your_password",
+      "cookies_file": "panel1.txt",
+      "connection_name": "sv1"
+    }
+  ],
   "Support_text": "متن پشتیبانی شما",
   "welcome_text": "به ربات نمایش حجم خوش آمدید",
   "admin_id": 123456789
