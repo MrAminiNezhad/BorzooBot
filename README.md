@@ -95,7 +95,7 @@ nano info.json
 ```
 nohup python3 main.py &
 ```
-# بروز رسانی ( بعد از بروز رسانی به ورزن 1.3.0 نیازمند وارد کردن مجدد اطلاعات پنل و ربات هستید )
+# بروز رسانی ( بعد از بروز رسانی به ورزن 1.3.1 نیازمند وارد کردن مجدد اطلاعات پنل و ربات هستید )
 1- جهت بروز رسانی از دستور زیر استفاده بکنید <br>
 ```
  bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/3x-ui-Sanaei-TelegramBot/main/update.sh)
