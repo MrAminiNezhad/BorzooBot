@@ -86,7 +86,7 @@ nano info.json
   ],
   "Support_text": "متن پشتیبانی شما",
   "welcome_text": "به ربات نمایش حجم خوش آمدید",
-  "admin_id": 123456789
+  "admin_ids": [123456789]
 }
 
 ```
