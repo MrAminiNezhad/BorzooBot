@@ -245,12 +245,10 @@ def read_info_from_file():
 
     return token, panels, support_text, admin_id, welcome_text
 
-
 TOKEN, panels, Support_text, Admin_ID, Welcome_text = read_info_from_file()
 
 bot = TelegramBot(TOKEN, panels, Support_text, Admin_ID, Welcome_text)
 bot.start_bot()
-
 
 #Developed By Mr.Amini
 #My Telegram ID: @MrAminiNehad
