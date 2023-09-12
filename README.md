@@ -90,6 +90,11 @@ nohup python3 main.py &
 # حمایت از پروژه
 جهت حمایت از پروژه و ارائه بروز رسانی های بیشتر از پروژه حمایت بکنید <br>
 Trx Wallet: TQhwK6q94GgpUZSsHBjiUWc6xAHz5Df9mW
+<br>
+شماره کارت : <br>
+50222910479892094<br>
+به نام : پوریا امینی<br>
 
-
+تلگرام جهت ارسال فیش و یا گذارش باگ ها <br>
+t.me/MrAminiNezhad
 
