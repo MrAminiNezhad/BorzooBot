@@ -1,100 +1,97 @@
-# ربات تلگرامی مخصوص پنل سنایی
-در حال حاضر ربات فقط میزان حجم باقی مانده کاربر را با استفاده از Email نمایش میدهد در پنل مقدار email به صورت 8to5wxh0 نمایش داده میشود و با ID متفاوت میباشد.<br>
-به مرور زمان با توجه به حمایت شما قابلیت های ساخت اکانت ، حذف اکانت و... به آن افزوده میشود
+<div align="center">
+برای توضیحات <a href="https://github.com/MrAminiNezhad/tcp_optimizer_hybla/blob/main/README-fa.md"> فارسی اینجا بزنید </a>
+</div>
+<br><br>
 
-# لیست امکانات ربات ورژن 1.3.0 
-1- نمایش میزان ترافیک مصرفی <br> 
-2- نمایش تاریخ انقضا اکانت <br>
-3- نمایش میزان دانلود و اپلود به صورت جدا گانه<br>
-4- نمایش میزان ترافیک باقی مانده <br>
-5- قابلیت ارسال پیام همگانی ( فقط مدیر ربات میتوانید اقدام به ارسال پیام بکند ) <br>
-6- قابلیت اتصال به چنیدن پنل به صورت همزمان <br>
-7- قابلیت اد کردن چندین ادمین <br>
+# Telegram bot for the  <a href="https://github.com/MrAminiNezhad/tcp_optimizer_hybla/blob/main/README-fa.md"> MHSanaei </a> panel
+Currently, the robot only displays the amount of the user's remaining volume using Email. In the panel, the email value is displayed as 8to5wxh0 and is different from the ID.<br>
+Over time, according to your support, the capabilities of creating an account, deleting an account, etc. will be added to it
 
-# پیش نمایش 
+# List of robot features version 1.3.0
+1- Display the amount of consumed traffic
+2- Display account expiration date
+3- Display the amount of download and upload separately<br>
+4- Display the amount of remaining traffic
+5- The ability to send public messages (only the bot manager can send messages) <br>
+6- The ability to connect to pick the panel at the same time <br>
+7- The ability to add several admins
+
+# Preview
 ![Borzoo Demo](https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/demo.JPG)
-# آموزش نصب
-1- جهت نصب سریع دستور زیر را بزنید تا پیشنیاز های اسکریپت نصب شود.<br>
+# learn inistallation
+1- For quick installation, type the following command to install the script prerequisites.<br>
 ```
- bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/install.sh)
+  bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/install.sh)
 ```
-2- سپس با دستور زیر محتوای درون فایل را ویرایش نمایید <br>
+2- Then edit the contents of the file with the command below
 ```
 nano info.json
 ```
-3- جهت اجرای اسکریپت دستور زیر را بزنید <br>
+3- To run the script, press <br>
 ```
 nohup python3 main.py &
 ```
-4- جهت خاموش کردن ربات میتوانید از دستور زیر استفاده بکنید <br>
+4- You can use the following command to turn off the robot
 ```
 pkill -f "main.py"
 ```
-# آموزش تنظیمات مولتی پنل
+# Teaching multi-panel settings
 
-1-برای تنظیمات مولتی پنل کافیت اول دستور خاموش کردن ربات را بزنید <br>
+1- For multi-panel settings, just press the command to turn off the robot
 ```
 pkill -f "main.py"
 ```
 
-2- سپس با دستور زیر فایل Info را ویرایش کنید <br>
+2- Then edit the Info file with the command below
 ```
 nano info.json
 ```
 
-3- محتوای فایل را به صورت زیر تغییر دهید ( میتوانید بی نهایت پنل اضافه بکنید فقط کافیست بخش مربوط به اطلاعات را کپی بکنید و در ادامه کد قرار بدید <br>
-لطفا توجه داشته باشید که مقدار cookies_file و connection_name باید نسبت به شماره پنل ویرایش شود <br>
+3- Change the content of the file as follows (you can add infinite panels, just copy the relevant section of the information and put the following code <br>
+Please note that the value of cookies_file and connection_name should be edited according to the panel number <br>
 ```
 {
-  "TOKEN": "Your_token",
-  "panels": [
-    {
-      "panel_url": "https://panel_address:port",
-      "panel_user": "your_user",
-      "panel_pass": "your_password",
-      "cookies_file": "panel1.txt",
-      "connection_name": "sv1"
-    },
-    {
-      "panel_url": "https://panel_address:port",
-      "panel_user": "your_user",
-      "panel_pass": "your_password",
-      "cookies_file": "panel2.txt",
-      "connection_name": "sv2"
-    }
-  ],
-  "Support_text": "متن پشتیبانی شما",
-  "welcome_text": "به ربات نمایش حجم خوش آمدید",
-  "admin_id": 123456789
+   "TOKEN": "Your_token",
+   "panels": [
+     {
+       "panel_url": "https://panel_address:port",
+       "panel_user": "your_user",
+       "panel_pass": "your_password",
+       "cookies_file": "panel1.txt",
+       "connection_name": "sv1"
+     },
+     {
+       "panel_url": "https://panel_address:port",
+       "panel_user": "your_user",
+       "panel_pass": "your_password",
+       "cookies_file": "panel2.txt",
+       "connection_name": "sv2"
+     }
+   ],
+   "Support_text": "Your support text",
+   "welcome_text": "Welcome to the volume display bot",
+   "admin_id": 123456789
 }
 
 ```
 
-4- جهت اجرای اسکریپت دستور زیر را بزنید <br>
+4- To execute the script, press <br>
 ```
 nohup python3 main.py &
 ```
-# بروز رسانی ( بعد از بروز رسانی به ورزن 1.3.0 نیازمند وارد کردن مجدد اطلاعات پنل و ربات هستید )
-1- جهت بروز رسانی از دستور زیر استفاده بکنید <br>
+# Update (after updating to version 1.3.0, you need to re-enter panel and robot information)
+1- Use the following command to update
 ```
- bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/update.sh)
+  bash <(curl -Ls https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/update.sh)
 ```
-2- اطلاعات پنل را مجدد در فایل زیر وارد بکنید <br>
+2- Re-enter the panel information in the following file <br>
 ```
 nano info.json
 ```
-3- سپس با دستور زیر ربات را روشن بکنید <br>
+3- Then turn on the robot with the command below
 ```
 nohup python3 main.py &
 ```
-# حمایت از پروژه
-جهت حمایت از پروژه و ارائه بروز رسانی های بیشتر از پروژه حمایت بکنید <br>
+# Support the project
+Support the project to support the project and provide more updates
 Trx Wallet: TQhwK6q94GgpUZSsHBjiUWc6xAHz5Df9mW
-<br>
-شماره کارت : <br>
-50222910479892094<br>
-به نام : پوریا امینی<br>
-
-تلگرام جهت ارسال فیش و یا گذارش باگ ها <br>
-t.me/MrAminiNezhad
-
