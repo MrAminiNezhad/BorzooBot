@@ -1,5 +1,5 @@
 <div align="center">
-برای توضیحات <a href="https://github.com/MrAminiNezhad/tcp_optimizer_hybla/blob/main/README-fa.md"> فارسی اینجا بزنید </a>
+برای توضیحات <a href="https://github.com/MrAminiNezhad/BorzooBot/blob/main/README-fa.md"> فارسی اینجا بزنید </a>
 </div>
 <br><br>
 
