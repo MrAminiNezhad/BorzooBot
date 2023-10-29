@@ -8,13 +8,13 @@ Currently, the robot only displays the amount of the user's remaining volume usi
 Over time, according to your support, the capabilities of creating an account, deleting an account, etc. will be added to it
 
 # List of robot features version 1.3.0
-1- Display the amount of consumed traffic
-2- Display account expiration date
+1- Display the amount of consumed traffic<br>
+2- Display account expiration date<br>
 3- Display the amount of download and upload separately<br>
-4- Display the amount of remaining traffic
+4- Display the amount of remaining traffic<br>
 5- The ability to send public messages (only the bot manager can send messages) <br>
 6- The ability to connect to pick the panel at the same time <br>
-7- The ability to add several admins
+7- The ability to add several admins<br>
 
 # Preview
 ![Borzoo Demo](https://raw.githubusercontent.com/MrAminiNezhad/BorzooBot/main/demo.JPG)
